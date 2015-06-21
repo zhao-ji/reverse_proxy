@@ -47,7 +47,7 @@ def ted(ted_path):
 if __name__ == "__main__":
     from os.path import abspath, exists, dirname, join
 
-    server_log_file = join(dirname(abspath(__file__)), "runtime.log")
+    server_log_file = join(dirname(abspath(__file__)), "logs", "runtime.log")
     if not exists(server_log_file):
         open(server_log_file, "w").close()
 
@@ -58,4 +58,4 @@ if __name__ == "__main__":
         u'{record.level_name}:{record.message}')
     local_log.push_application()
 
-    app.run(port=5000)
+    app.run(port=6666)
