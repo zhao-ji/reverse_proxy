@@ -20,17 +20,19 @@ def ted(ted_path):
     headers["X-Real-IP"] = request.remote_addr
     headers["X-Forwarded-For"] = request.remote_addr
     headers["X-Forwarded-Proto"] = "https"
-    local_log.info(request.remote_addr)
-    local_log.info(request.headers.get("User-Agent"))
+    logbook.info(request.remote_addr)
+    logbook.info(request.headers.get("User-Agent"))
 
     ted_ret = get(
         "{}/{}".format(TED_PREFIX, ted_path),
         headers=headers,
     )
+    logbook.info(ted_ret.status_code)
+    logbook.info("{}/{}".format(TED_PREFIX, ted_path))
     assert ted_ret.ok
 
     ted_content = ted_ret.content
-    ted_content.replace(
+    return ted_content.replace(
         "ajax.googleapis.com", "cdnjs.cloudflare.com",
     ).replace(
         r'"/images', r'"{}/images'.format(TED_PREFIX),
@@ -41,8 +43,6 @@ def ted(ted_path):
         r'"/js/ZeroClipboard.min.js',
         r'"{}/js/ZeroClipboard.min.js'.format(TED_PREFIX),
     )
-
-    return ted_content
 
 if __name__ == "__main__":
     from os.path import abspath, exists, dirname, join
@@ -58,4 +58,4 @@ if __name__ == "__main__":
         u'{record.level_name}:{record.message}')
     local_log.push_application()
 
-    app.run(port=6666)
+    app.run(host="127.0.0.1", port=6666, debug=False)
