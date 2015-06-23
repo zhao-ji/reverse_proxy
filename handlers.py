@@ -23,6 +23,7 @@ def ted(ted_path):
     headers["X-Real-IP"] = request.remote_addr
     headers["X-Forwarded-For"] = request.remote_addr
     headers["X-Forwarded-Proto"] = "https"
+    logbook.info(request.access_route[-1])
     logbook.info(request.remote_addr)
     logbook.info(request.headers.get("User-Agent"))
 
@@ -46,6 +47,8 @@ def ted(ted_path):
         r'"/js/ZeroClipboard.min.js',
         r'"{}/js/ZeroClipboard.min.js'.format(TED_PREFIX),
     )
+
+app.add_url_rule("/ted/<path:ted_path>", "ted", ted)
 
 
 @app.route("/youtube/<path:proxy_path>", methods=["GET"])
@@ -86,6 +89,8 @@ def youtube(proxy_path):
         ret_back,
     )
     return ret_back
+
+app.add_url_rule("/youtube/<path:proxy_path>", "youtube", youtube)
 
 
 if __name__ == "__main__":
