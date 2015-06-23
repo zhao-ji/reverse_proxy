@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 # utf8
 
+import re
+
 from flask import Flask
-from flask import request
+from flask import request, url_for
 
 import logbook
 from requests import get
@@ -10,6 +12,7 @@ from requests import get
 app = Flask(__name__)
 
 TED_PREFIX = "https://embed-ssl.ted.com"
+YOUTUBE_PREFIX = "https://www.youtube.com"
 
 
 @app.route("/ted/<path:ted_path>", methods=["GET"])
@@ -43,6 +46,47 @@ def ted(ted_path):
         r'"/js/ZeroClipboard.min.js',
         r'"{}/js/ZeroClipboard.min.js'.format(TED_PREFIX),
     )
+
+
+@app.route("/youtube/<path:proxy_path>", methods=["GET"])
+def youtube(proxy_path):
+    headers = {}
+    headers["Accept-Encoding"] = ""
+    headers["User-Agent"] = request.headers.get("User-Agent")
+    headers["X-Real-IP"] = request.remote_addr
+    headers["X-Forwarded-For"] = request.remote_addr
+    headers["X-Forwarded-Proto"] = "https"
+
+    ret = get(
+        "{}/{}".format(YOUTUBE_PREFIX, proxy_path),
+        headers=headers,
+    )
+    logbook.info(ret.status_code)
+    logbook.info("{}/{}".format(YOUTUBE_PREFIX, proxy_path))
+    assert ret.ok
+
+    ret_back = re.sub(
+        r"//s.ytimg.com/.*/html5player.js",
+        url_for("youtube", path="static/js/html5player.js"),
+        ret.content,
+    )
+    ret_back = re.sub(
+        r"//s.ytimg.com/.*/www-embed-player.js",
+        url_for("youtube", path="static/js/www-embed-player.js"),
+        ret_back,
+    )
+    ret_back = re.sub(
+        r"//s.ytimg.com/yts/cssbin/www-embed-player-vflT40uKk.css",
+        url_for("youtube", path="static/css/www-embed-player.css"),
+        ret_back,
+    )
+    ret_back = re.sub(
+        r'<style name="www-roboto">.*</style>',
+        '',
+        ret_back,
+    )
+    return ret_back
+
 
 if __name__ == "__main__":
     from os.path import abspath, exists, dirname, join
