@@ -4,7 +4,7 @@
 import re
 
 from flask import Flask
-from flask import request, url_for
+from flask import request
 
 import logbook
 from requests import get
@@ -68,17 +68,22 @@ def youtube(proxy_path):
 
     ret_back = re.sub(
         r"//s.ytimg.com/.*/html5player.js",
-        url_for("youtube", proxy_path="static/js/html5player.js"),
+        "/static/js/html5player.js",
         ret.content,
     )
     ret_back = re.sub(
         r"//s.ytimg.com/.*/www-embed-player.js",
-        url_for("youtube", proxy_path="static/js/www-embed-player.js"),
+        "/static/js/www-embed-player.js",
         ret_back,
     )
     ret_back = re.sub(
-        r"//s.ytimg.com/yts/cssbin/www-embed-player-vflT40uKk.css",
-        url_for("youtube", proxy_path="static/css/www-embed-player.css"),
+        r"//www.google.com/js/bg/.*.js",
+        "/static/js/bg.js",
+        ret_back,
+    )
+    ret_back = re.sub(
+        r"//s.ytimg.com/.*/www-embed-player.*.css",
+        "/static/css/www-embed-player.css",
         ret_back,
     )
     ret_back = re.sub(
