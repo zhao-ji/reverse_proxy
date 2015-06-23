@@ -48,8 +48,6 @@ def ted(ted_path):
         r'"{}/js/ZeroClipboard.min.js'.format(TED_PREFIX),
     )
 
-app.add_url_rule("/ted/<path:ted_path>", "ted", ted)
-
 
 @app.route("/youtube/<path:proxy_path>", methods=["GET"])
 def youtube(proxy_path):
@@ -70,17 +68,17 @@ def youtube(proxy_path):
 
     ret_back = re.sub(
         r"//s.ytimg.com/.*/html5player.js",
-        url_for("youtube", path="static/js/html5player.js"),
+        url_for("youtube", proxy_path="static/js/html5player.js"),
         ret.content,
     )
     ret_back = re.sub(
         r"//s.ytimg.com/.*/www-embed-player.js",
-        url_for("youtube", path="static/js/www-embed-player.js"),
+        url_for("youtube", proxy_path="static/js/www-embed-player.js"),
         ret_back,
     )
     ret_back = re.sub(
         r"//s.ytimg.com/yts/cssbin/www-embed-player-vflT40uKk.css",
-        url_for("youtube", path="static/css/www-embed-player.css"),
+        url_for("youtube", proxy_path="static/css/www-embed-player.css"),
         ret_back,
     )
     ret_back = re.sub(
@@ -88,9 +86,8 @@ def youtube(proxy_path):
         '',
         ret_back,
     )
-    return ret_back
 
-app.add_url_rule("/youtube/<path:proxy_path>", "youtube", youtube)
+    return ret_back
 
 
 if __name__ == "__main__":
@@ -107,4 +104,4 @@ if __name__ == "__main__":
         u'{record.level_name}:{record.message}')
     local_log.push_application()
 
-    app.run(host="127.0.0.1", port=6666, debug=False)
+    app.run(host="127.0.0.1", port=6666, debug=True)
